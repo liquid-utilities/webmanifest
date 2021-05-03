@@ -1,0 +1,840 @@
+---
+vim: filetype=liquid
+author: S0AndS0
+version: 0.0.1
+license: AGPL-3.0
+description: Build `webmanifest` file from FrontMatter or YAML
+source: 'https://github.com/liquid-utilities/webmanifest'
+layout: null
+---
+{% capture workspace__webmanifest %}
+{% comment %}
+
+
+## Example Usage
+
+
+**`site.webmanifest`**
+
+
+{% raw %}
+```YAML
+---
+layout: modules/webmanifest/webmanifest
+filter: absolute_url
+
+background_color: black
+
+description: Example PWA (Progressive Web Application) configured by `liquid-utilities/webmanifest`
+dir: ltr
+display: standalone
+iarc_rating_id: e84b072d-71b3-4d3e-86ae-31a8ce4e53b7
+
+lang: en-US
+name: Liquid Utilities -- Site Web Manifest Example
+orientation: ""
+prefer_related_applications: false
+
+scope: app
+
+short_name: Site Web Manifest Example
+start_url: /
+theme_color: red
+
+categories:
+  - books
+  - education
+  - medical
+
+icons:
+  filter: relative_url
+
+  - src: assets/images/icons/android-chrome-192x192.png
+    purpose: monochrome
+    sizes: 192x192
+    type: image/png
+
+  - src: assets/images/icons/android-chrome-384x384.png
+    filter: absolute_url
+    type: image/png
+
+protocol_handlers:
+  filter: relative_url
+
+  - protocol: web+jngl
+    url: lookup?type%s
+
+  - protocol: web+jnglstore
+    filter: absolute_url
+    url: shop?for=%s
+
+related_applications:
+  - platform: play
+    url: https://play.google.com/store/apps/details?id=com.example.app1
+    id: com.example.app1
+
+  - platform: itunes
+    url: https://itunes.apple.com/app/example-app1/id123456789
+
+screenshots:
+  filter: relative_url
+
+  - src: assets/images/screenshots/screenshot1.webp
+    sizes: 1280x780
+    type: image/webp
+
+  - src: assets/images/screenshots/screenshot2.webp
+    filter: absolute_url
+    sizes: 1280x720
+    type: image/webp
+
+shortcuts:
+  filter: absolute_url
+
+  - name: "Today's agenda"
+    filter: relative_url
+    short_name: Agenda
+    description: List of events planned for today
+    url: today
+
+    icons:
+      filter: relative_url
+
+      - purpose: monochrome
+        sizes: 120x120
+        src: assets/images/shortcuts/agenda/medium.webp
+        type: image/webp
+
+      - src: assets/images/shortcuts/agenda/small.webp
+        filter: absolute_url
+        sizes: 90x90
+        type: image/webp
+
+  - name: New event
+    url: create/event
+
+  - name: New reminder
+    url: create/reminder
+---
+```
+{% endraw %}
+
+
+> Above will parse values from `webmanifest` and `static_files` if not defined within the layout file
+
+
+## Example Output
+
+
+```JSON
+```
+
+
+> Note, above _`src`s_ for `icons` will only appear if icons are found
+
+
+{% endcomment %}
+{% assign webmanifest__config_name = page.config_name | default: nil %}
+{% if webmanifest__config_name %}
+  {% assign webmanifest__object = site.webmanifest[webmanifest__config_name] | default: nil %}
+{% else %}
+  {% assign webmanifest__object = page | default: nil %}
+{% endif %}
+
+{% assign webmanifest__data = '' | split: '' %}
+
+
+{% assign webmanifest__background_color = webmanifest__object.background_color | default: nil %}
+{% if webmanifest__background_color %}
+  {% capture webmanifest__background_color %}"background_color":"{{ webmanifest__background_color }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__background_color %}
+  {% assign webmanifest__background_color = nil %}
+{% endif %}
+
+
+{% assign webmanifest__categories = webmanifest__object.categories | default: nil %}
+{% if webmanifest__categories %}
+  {% unless webmanifest__categories[0] %}
+    {% assign webmanifest__categories = webmanifest__categories | split: ' ' %}
+  {% endunless %}
+  {% capture webmanifest__categories %}"categories":{{ webmanifest__categories | jsonify }}{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__categories %}
+  {% assign webmanifest__categories = nil %}
+{% endif %}
+
+
+{% assign webmanifest__description = webmanifest__object.description | default: nil %}
+{% if webmanifest__description %}
+  {% capture webmanifest__description %}"description":"{{ webmanifest__description }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__description %}
+  {% assign webmanifest__description = nil %}
+{% endif %}
+
+
+{% assign webmanifest__dir = webmanifest__object.dir | default: nil %}
+{% if webmanifest__dir %}
+  {% capture webmanifest__dir %}"dir":"{{ webmanifest__dir }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__dir %}
+  {% assign webmanifest__dir = nil %}
+{% endif %}
+
+
+{% assign webmanifest__display = webmanifest__object.display | default: nil %}
+{% if webmanifest__display %}
+  {% capture webmanifest__display %}"display":"{{ webmanifest__display }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__display %}
+  {% assign webmanifest__display = nil %}
+{% endif %}
+
+
+{% assign webmanifest__iarc_rating_id = webmanifest__object.iarc_rating_id | default: nil %}
+{% if webmanifest__iarc_rating_id %}
+  {% capture webmanifest__iarc_rating_id %}"iarc_rating_id":"{{ webmanifest__iarc_rating_id }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__iarc_rating_id %}
+  {% assign webmanifest__iarc_rating_id = nil %}
+{% endif %}
+
+
+{% assign webmanifest__lang = webmanifest__object.lang | default: nil %}
+{% if webmanifest__lang %}
+  {% capture webmanifest__lang %}"lang":"{{ webmanifest__lang }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__lang %}
+  {% assign webmanifest__lang = nil %}
+{% endif %}
+
+
+{% assign webmanifest__name = webmanifest__object.name | default: nil %}
+{% if webmanifest__name %}
+  {% capture webmanifest__name %}"name":"{{ webmanifest__name }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__name %}
+  {% assign webmanifest__name = nil %}
+{% endif %}
+
+
+{% assign webmanifest__orientation = webmanifest__object.orientation | default: nil %}
+{% if webmanifest__orientation %}
+  {% capture webmanifest__orientation %}"orientation":"{{ webmanifest__orientation }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__orientation %}
+  {% assign webmanifest__orientation = nil %}
+{% endif %}
+
+
+{% assign webmanifest__prefer_related_applications = webmanifest__object.prefer_related_applications | default: nil %}
+{% if webmanifest__prefer_related_applications %}
+  {% if webmanifest__prefer_related_applications == true %}
+    {% capture webmanifest__prefer_related_applications %}"prefer_related_applications":{{ webmanifest__prefer_related_applications | jsonify }}{% endcapture %}
+  {% else %}
+    {% capture webmanifest__prefer_related_applications %}"prefer_related_applications":{{ false | jsonify }}{% endcapture %}
+  {% endif %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__prefer_related_applications %}
+  {% assign webmanifest__prefer_related_applications = nil %}
+{% endif %}
+
+
+{% assign webmanifest__scope = webmanifest__object.scope | default: nil %}
+{% if webmanifest__scope %}
+  {% assign webmanifest__scope__filter = webmanifest__object.filter | default: nil %}
+  {% assign webmanifest__scope__parts = webmanifest__scope | split: '//' %}
+  {% if webmanifest__scope__parts.size == 1 %}
+    {% if webmanifest__scope__filter == 'relative_url' %}
+      {% capture webmanifest__scope %}{{ webmanifest__scope | relative_url }}{% endcapture %}
+    {% elsif webmanifest__scope__filter == 'absolute_url' %}
+      {% capture webmanifest__scope %}{{ webmanifest__scope | absolute_url }}{% endcapture %}
+    {% endif %}
+  {% endif %}
+  {% assign webmanifest__scope__parts = nil %}
+  {% assign webmanifest__scope__filter = nil %}
+
+  {% capture webmanifest__scope %}"scope":"{{ webmanifest__scope }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__scope %}
+  {% assign webmanifest__scope = nil %}
+{% endif %}
+
+
+{% assign webmanifest__short_name = webmanifest__object.short_name | default: nil %}
+{% if webmanifest__short_name %}
+  {% capture webmanifest__short_name %}"short_name":"{{ webmanifest__short_name }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__short_name %}
+  {% assign webmanifest__short_name = nil %}
+{% endif %}
+
+
+{% assign webmanifest__start_url = webmanifest__object.start_url | default: nil %}
+{% if webmanifest__start_url %}
+  {% assign webmanifest__start_url__filter = webmanifest__object.filter | default: nil %}
+  {% assign webmanifest__start_url__parts = webmanifest__start_url | split: '//' %}
+  {% if webmanifest__start_url__parts.size == 1 %}
+    {% if webmanifest__start_url__filter == 'relative_url' %}
+      {% capture webmanifest__start_url %}{{ webmanifest__start_url | relative_url }}{% endcapture %}
+    {% elsif webmanifest__start_url__filter == 'absolute_url' %}
+      {% capture webmanifest__start_url %}{{ webmanifest__start_url | absolute_url }}{% endcapture %}
+    {% endif %}
+  {% endif %}
+  {% assign webmanifest__start_url__parts = nil %}
+  {% assign webmanifest__start_url__filter = nil %}
+
+  {% capture webmanifest__start_url %}"start_url":"{{ webmanifest__start_url }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__start_url %}
+  {% assign webmanifest__start_url = nil %}
+{% endif %}
+
+
+{% assign webmanifest__theme_color = webmanifest__object.theme_color | default: nil %}
+{% if webmanifest__theme_color %}
+  {% capture webmanifest__theme_color %}"theme_color":"{{ webmanifest__theme_color }}"{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__theme_color %}
+  {% assign webmanifest__theme_color = nil %}
+{% endif %}
+
+
+{% assign webmanifest__curly_brace__open = '{' %}
+{% assign webmanifest__curly_brace__close = '}' %}
+
+
+{% comment %}
+  Mark_Start: webmanifest__icons
+  See: webmanifest__shortcut__icons
+{% endcomment %}
+{% assign webmanifest__icons = webmanifest__object.icons | default: nil %}
+{% if webmanifest__icons %}
+  {% assign webmanifest__icons__list = '' | split: '' %}
+  {% assign webmanifest__icons__filter = webmanifest__icons.filter | default: nil %}
+  {% unless webmanifest__icons__filter or webmanifest__icons__filter == false %}
+    {% assign webmanifest__icons__filter = webmanifest__object.filter | default: nil %}
+  {% endunless %}
+
+  {% for webmanifest__icon in webmanifest__icons %}
+    {% assign webmanifest__icon__data = '' | split: '' %}
+
+
+    {% assign webmanifest__icon__src = webmanifest__icon.src | default: nil %}
+    {% unless webmanifest__icon__src %}
+      {% continue %}
+    {% endunless %}
+
+    {% assign webmanifest__icon__filter = webmanifest__icon.filter | default: nil %}
+    {% unless webmanifest__icon__filter or webmanifest__icon__filter == false %}
+      {% assign webmanifest__icon__filter = webmanifest__icons__filter %}
+    {% endunless %}
+
+    {% assign webmanifest__icon__src__parts = webmanifest__icon__src | split: '//' %}
+    {% if webmanifest__icon__src__parts.size == 1 %}
+      {% if webmanifest__icon__filter == 'relative_url' %}
+        {% capture webmanifest__icon__src %}{{ webmanifest__icon__src | relative_url }}{% endcapture %}
+      {% elsif webmanifest__icon__filter == 'absolute_url' %}
+        {% capture webmanifest__icon__src %}{{ webmanifest__icon__src | absolute_url }}{% endcapture %}
+      {% endif %}
+    {% endif %}
+    {% assign webmanifest__icon__src__parts = nil %}
+    {% assign webmanifest__icon__filter = nil %}
+
+    {% capture webmanifest__icon__src %}"src":"{{ webmanifest__icon__src }}"{% endcapture %}
+    {% assign webmanifest__icon__data = webmanifest__icon__data | append: webmanifest__icon__src %}
+    {% assign webmanifest__icon__src = nil %}
+
+
+    {% assign webmanifest__icon__type = webmanifest__icon.type | default: nil %}
+    {% if webmanifest__icon__type %}
+      {% if webmanifest__icon__type[0] %}
+        {% capture webmanifest__icon__type %}"type":"image/{{ webmanifest__icon__type | join: ' ' }}"{% endcapture %}
+      {% else %}
+        {% capture webmanifest__icon__type %}"type":"image/{{ webmanifest__icon__type }}"{% endcapture %}
+      {% endif %}
+      {% assign webmanifest__icon__data = webmanifest__icon__data | append: webmanifest__icon__type %}
+    {% endif %}
+    {% assign webmanifest__icon__type = nil %}
+
+    {% assign webmanifest__icon__sizes = webmanifest__icon.sizes | default: nil %}
+    {% if webmanifest__icon__sizes %}
+      {% if webmanifest__icon__sizes[0] %}
+        {% capture webmanifest__icon__sizes %}"sizes":"{{ webmanifest__icon__sizes | join: ' ' }}"{% endcapture %}
+      {% else %}
+        {% capture webmanifest__icon__sizes %}"sizes":"{{ webmanifest__icon__sizes }}"{% endcapture %}
+      {% endif %}
+      {% assign webmanifest__icon__data = webmanifest__icon__data | append: webmanifest__icon__sizes %}
+    {% endif %}
+    {% assign webmanifest__icon__sizes = nil %}
+
+    {% assign webmanifest__icon__purpose = webmanifest__icon.purpose | default: nil %}
+    {% if webmanifest__icon__purpose %}
+      {% if webmanifest__icon__purpose[0] %}
+        {% capture webmanifest__icon__purpose %}"purpose":"{{ webmanifest__icon__purpose | join: ' ' }}"{% endcapture %}
+      {% else %}
+        {% capture webmanifest__icon__purpose %}"purpose":"{{ webmanifest__icon__purpose }}"{% endcapture %}
+      {% endif %}
+      {% assign webmanifest__icon__data = webmanifest__icon__data | append: webmanifest__icon__purpose %}
+    {% endif %}
+    {% assign webmanifest__icon__purpose = nil %}
+
+    {% if webmanifest__icon__data.size > 0 %}
+      {% capture webmanifest__icons__item %}{{
+        webmanifest__curly_brace__open
+      }}{{
+        webmanifest__icon__data | join: ',' | strip | strip_newlines
+      }}{{
+        webmanifest__curly_brace__close
+      }}{% endcapture %}
+
+      {% assign webmanifest__icons__list = webmanifest__icons__list | append: webmanifest__icons__item %}
+      {% assign webmanifest__icons__item = nil %}
+    {% endif %}
+
+    {% assign webmanifest__icon__data = nil %}
+  {% endfor %}
+
+  {% assign webmanifest__icon__filter = nil %}
+  {% assign webmanifest__icons__filter = nil %}
+  {% assign webmanifest__icon__data = nil %}
+  {% assign webmanifest__icons__item = nil %}
+{% else %}
+  {% assign webmanifest__icons__list = '' | split: '' %}
+
+  {% capture webmanifest__icons__item %}{{
+    webmanifest__curly_brace__open
+  }}"src":"https://placekitten.com/48/48","sizes":"48x48"{{
+    webmanifest__curly_brace__close
+  }}{% endcapture %}
+
+  {% assign webmanifest__icons__list = webmanifest__icons__list | append: webmanifest__icons__item %}
+  {% assign webmanifest__icons__item = nil %}
+{% endif %}
+
+{% if webmanifest__icons__list.size > 0 %}
+  {% capture webmanifest__icons__data %}"icons":{{ webmanifest__icons__list | jsonify }}{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__icons__data %}
+  {% assign webmanifest__icons__data = nil %}
+  {% assign webmanifest__icons__list = nil %}
+{% endif %}
+{% comment %}
+  Mark_End: webmanifest__icons
+{% endcomment %}
+
+
+{% comment %}{% endcomment %}
+{% assign webmanifest__protocol_handlers = webmanifest__object.protocol_handlers | default: nil %}
+{% if webmanifest__protocol_handlers %}
+  {% assign webmanifest__protocol_handlers__list = '' | split: '' %}
+  {% assign webmanifest__protocal_handlers__filter = webmanifest__protocal_handlers.filter | default: nil %}
+  {% unless webmanifest__protocal_handlers__filter or webmanifest__protocal_handlers__filter == false %}
+    {% assign webmanifest__protocal_handlers__filter = webmanifest__object.filter | default: nil %}
+  {% endunless %}
+
+  {% for webmanifest__protocol_handler in webmanifest__protocol_handlers %}
+    {% assign webmanifest__protocol_handler__data = '' | split: '' %}
+
+
+    {% assign webmanifest__protocol_handler__url = webmanifest__protocol_handler.url | default: nil %}
+    {% unless webmanifest__protocol_handler__url %}
+      {% continue %}
+    {% endunless %}
+
+    {% assign webmanifest__protocal_handler__filter = webmanifest__protocal_handler.filter | default: nil %}
+    {% unless webmanifest__protocal_handler__filter or webmanifest__protocal_handler__filter == false %}
+      {% assign webmanifest__protocal_handler__filter = webmanifest__protocal_handlers__filter %}
+    {% endunless %}
+
+    {% assign webmanifest__protocol_handler__url__parts = webmanifest__protocol_handler__url | split: '//' %}
+    {% if webmanifest__protocol_handler__url__parts.size == 1 %}
+      {% if webmanifest__protocol_handler__filter == 'relative_url' %}
+        {% capture webmanifest__protocol_handler__url %}{{ webmanifest__protocol_handler__url | relative_url }}{% endcapture %}
+      {% elsif webmanifest__protocol_handler__filter == 'absolute_url' %}
+        {% capture webmanifest__protocol_handler__url %}{{ webmanifest__protocol_handler__url | absolute_url }}{% endcapture %}
+      {% endif %}
+    {% endif %}
+    {% assign webmanifest__protocol_handler__url__parts = nil %}
+    {% assign webmanifest__protocal_handler__filter = nil %}
+
+    {% capture webmanifest__protocol_handler__url %}"url":"{{ webmanifest__protocol_handler__url }}"{% endcapture %}
+    {% assign webmanifest__protocol_handler__data = webmanifest__protocol_handler__data | append: webmanifest__protocol_handler__url %}
+    {% assign webmanifest__protocol_handler__url = nil %}
+
+
+    {% assign webmanifest__protocol_handler__protocol = webmanifest__protocol_handler.protocol | default: nil %}
+    {% unless webmanifest__protocol_handler__protocol %}
+      {% continue %}
+    {% endunless %}
+    {% capture webmanifest__protocol_handler__protocol %}"protocol":"{{ webmanifest__protocol_handler__protocol }}"{% endcapture %}
+    {% assign webmanifest__protocol_handler__data = webmanifest__protocol_handler__data | append: webmanifest__protocol_handler__protocol %}
+    {% assign webmanifest__protocol_handler__protocol = nil %}
+
+    {% if webmanifest__protocol_handler__data.size > 0 %}
+      {% capture webmanifest__protocol_handlers__item %}{{
+        webmanifest__curly_brace__open
+      }}{{
+        webmanifest__protocol_handler__data | join: ',' | strip | strip_newlines
+      }}{{
+        webmanifest__curly_brace__close
+      }}{% endcapture %}
+
+      {% assign webmanifest__protocol_handlers__list = webmanifest__protocol_handlers__list | append: webmanifest__protocol_handlers__item %}
+      {% assign webmanifest__protocol_handlers__item = nil %}
+    {% endif %}
+
+    {% assign webmanifest__protocol_handler__data = nil %}
+  {% endfor %}
+{% endif %}
+
+{% if webmanifest__protocol_handlers__list.size > 0 %}
+  {% capture webmanifest__protocol_handlers__data %}"protocol_handlers":{{ webmanifest__protocol_handlers__list | jsonify }}{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__protocol_handlers__data %}
+  {% assign webmanifest__protocol_handlers__data = nil %}
+  {% assign webmanifest__protocol_handlers__list = nil %}
+{% endif %}
+
+
+{% comment %}{% endcomment %}
+{% assign webmanifest__related_applications = webmanifest__object.related_applications | default: nil %}
+{% if webmanifest__related_applications %}
+  {% assign webmanifest__related_applications__list = '' | split: '' %}
+  {% for webmanifest__related_application in webmanifest__related_applications %}
+    {% assign webmanifest__related_application__data = '' | split: '' %}
+
+    {% assign webmanifest__related_application__platform = webmanifest__related_application.platform | default: nil %}
+    {% unless webmanifest__related_application__platform %}
+      {% continue %}
+    {% endunless %}
+    {% capture webmanifest__related_application__platform %}"platform":"{{ webmanifest__related_application__platform }}"{% endcapture %}
+    {% assign webmanifest__related_application__data = webmanifest__related_application__data | append: webmanifest__related_application__platform %}
+    {% assign webmanifest__related_application__platform = nil %}
+
+    {% assign webmanifest__related_application__url = webmanifest__related_application.url | default: nil %}
+    {% unless webmanifest__related_application__url %}
+      {% continue %}
+    {% endunless %}
+    {% capture webmanifest__related_application__url %}"url":"{{ webmanifest__related_application__url }}"{% endcapture %}
+    {% assign webmanifest__related_application__data = webmanifest__related_application__data | append: webmanifest__related_application__url %}
+    {% assign webmanifest__related_application__url = nil %}
+
+    {% assign webmanifest__related_application__id = webmanifest__related_application.id | default: nil %}
+    {% unless webmanifest__related_application__id %}
+      {% continue %}
+    {% endunless %}
+    {% capture webmanifest__related_application__id %}"id":"{{ webmanifest__related_application__id }}"{% endcapture %}
+    {% assign webmanifest__related_application__data = webmanifest__related_application__data | append: webmanifest__related_application__id %}
+    {% assign webmanifest__related_application__id = nil %}
+
+    {% if webmanifest__related_application__data.size > 0 %}
+      {% capture webmanifest__related_applications__item %}{{
+        webmanifest__curly_brace__open
+      }}{{
+        webmanifest__related_application__data | join: ',' | strip | strip_newlines
+      }}{{
+        webmanifest__curly_brace__close
+      }}{% endcapture %}
+
+      {% assign webmanifest__related_applications__list = webmanifest__related_applications__list | append: webmanifest__related_applications__item %}
+      {% assign webmanifest__related_applications__item = nil %}
+    {% endif %}
+
+    {% assign webmanifest__related_application__data = nil %}
+  {% endfor %}
+{% endif %}
+
+{% if webmanifest__related_applications__list.size > 0 %}
+  {% capture webmanifest__related_applications__data %}"related_applications":{{ webmanifest__related_applications__list | jsonify }}{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__related_applications__data %}
+  {% assign webmanifest__related_applications__data = nil %}
+  {% assign webmanifest__related_applications__list = nil %}
+{% endif %}
+
+
+{% comment %}{% endcomment %}
+{% assign webmanifest__screenshots = webmanifest__object.screenshots | default: nil %}
+{% if webmanifest__screenshots %}
+  {% assign webmanifest__screenshots__list = '' | split: '' %}
+  {% assign webmanifest__screenshots__filter = webmanifest__screenshots.filter | default: nil %}
+  {% unless webmanifest__screenshots__filter or webmanifest__screenshots__filter == false %}
+    {% assign webmanifest__screenshots__filter = webmanifest__object.filter | default: nil %}
+  {% endunless %}
+
+  {% for webmanifest__screenshot in webmanifest__screenshots %}
+    {% assign webmanifest__screenshot__data = '' | split: '' %}
+
+
+    {% assign webmanifest__screenshot__src = webmanifest__screenshot.src | default: nil %}
+    {% unless webmanifest__screenshot__src %}
+      {% continue %}
+    {% endunless %}
+
+    {% assign webmanifest__screenshot__filter = webmanifest__screenshot.filter | default: nil %}
+    {% unless webmanifest__screenshot__filter or webmanifest__screenshot__filter == false %}
+      {% assign webmanifest__screenshot__filter = webmanifest__screenshots__filter %}
+    {% endunless %}
+
+    {% assign webmanifest__screenshot__src__parts = webmanifest__screenshot__src | split: '//' %}
+    {% if webmanifest__screenshot__src__parts.size == 1 %}
+      {% if webmanifest__screenshot__filter == 'relative_url' %}
+        {% capture webmanifest__screenshot__src %}{{ webmanifest__screenshot__src | relative_url }}{% endcapture %}
+      {% elsif webmanifest__screenshot__filter == 'absolute_url' %}
+        {% capture webmanifest__screenshot__src %}{{ webmanifest__screenshot__src | absolute_url }}{% endcapture %}
+      {% endif %}
+    {% endif %}
+    {% assign webmanifest__screenshot__src__parts = nil %}
+    {% assign webmanifest__screenshot__filter = nil %}
+
+    {% capture webmanifest__screenshot__src %}"src":"{{ webmanifest__screenshot__src }}"{% endcapture %}
+    {% assign webmanifest__screenshot__data = webmanifest__screenshot__data | append: webmanifest__screenshot__src %}
+    {% assign webmanifest__screenshot__src = nil %}
+
+
+    {% assign webmanifest__screenshot__sizes = webmanifest__screenshot.sizes | default: nil %}
+    {% if webmanifest__screenshot__sizes %}
+      {% capture webmanifest__screenshot__sizes %}"sizes":"{{ webmanifest__screenshot__sizes }}"{% endcapture %}
+      {% assign webmanifest__screenshot__data = webmanifest__screenshot__data | append: webmanifest__screenshot__sizes %}
+      {% assign webmanifest__screenshot__sizes = nil %}
+    {% endif %}
+
+    {% assign webmanifest__screenshot__type = webmanifest__screenshot.type | default: nil %}
+    {% if webmanifest__screenshot__type %}
+      {% capture webmanifest__screenshot__type %}"type":"{{ webmanifest__screenshot__type }}"{% endcapture %}
+      {% assign webmanifest__screenshot__data = webmanifest__screenshot__data | append: webmanifest__screenshot__type %}
+      {% assign webmanifest__screenshot__type = nil %}
+    {% endif %}
+
+    {% if webmanifest__screenshot__data.size > 0 %}
+      {% capture webmanifest__screenshots__item %}{{
+        webmanifest__curly_brace__open
+      }}{{
+        webmanifest__screenshot__data | join: ',' | strip | strip_newlines
+      }}{{
+        webmanifest__curly_brace__close
+      }}{% endcapture %}
+
+      {% assign webmanifest__screenshots__list = webmanifest__screenshots__list | append: webmanifest__screenshots__item %}
+      {% assign webmanifest__screenshots__item = nil %}
+    {% endif %}
+
+    {% assign webmanifest__screenshot__data = nil %}
+  {% endfor %}
+
+  {% assign webmanifest__screenshot__data = nil %}
+  {% assign webmanifest__screenshot__filter = nil %}
+  {% assign webmanifest__screenshots__filter = nil %}
+{% endif %}
+
+{% if webmanifest__screenshots__list.size > 0 %}
+  {% capture webmanifest__screenshots__data %}"screenshots":{{ webmanifest__screenshots__list | jsonify }}{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__screenshots__data %}
+  {% assign webmanifest__screenshots__data = nil %}
+  {% assign webmanifest__screenshots__list = nil %}
+{% endif %}
+
+
+{% comment %}{% endcomment %}
+{% assign webmanifest__shortcuts = webmanifest__object.shortcuts | default: nil %}
+{% if webmanifest__shortcuts %}
+  {% assign webmanifest__shortcuts__list = '' | split: '' %}
+  {% assign webmanifest__shortcuts__filter = webmanifest__shortcuts.filter | default: nil %}
+  {% unless webmanifest__shortcuts__filter or webmanifest__shortcuts__filter == false %}
+    {% assign webmanifest__shortcuts__filter = webmanifest__object.filter | default: nil %}
+  {% endunless %}
+
+  {% for webmanifest__shortcut in webmanifest__shortcuts %}
+    {% assign webmanifest__shortcut__data = '' | split: '' %}
+
+    {% assign webmanifest__shortcut__name = webmanifest__shortcut.name | default: nil %}
+    {% unless webmanifest__shortcut__name %}
+      {% continue %}
+    {% endunless %}
+    {% capture webmanifest__shortcut__name %}"name":"{{ webmanifest__shortcut__name }}"{% endcapture %}
+    {% assign webmanifest__shortcut__data = webmanifest__shortcut__data | append: webmanifest__shortcut__name %}
+    {% assign webmanifest__shortcut__name = nil %}
+
+
+    {% assign webmanifest__shortcut__url = webmanifest__shortcut.url | default: nil %}
+    {% unless webmanifest__shortcut__url %}
+      {% continue %}
+    {% endunless %}
+
+    {% assign webmanifest__shortcut__filter = webmanifest__shortcut.filter | default: nil %}
+    {% unless webmanifest__shortcut__filter or webmanifest__shortcut__filter == false %}
+      {% assign webmanifest__shortcut__filter = webmanifest__shortcuts__filter %}
+    {% endunless %}
+
+    {% assign webmanifest__shortcut__url__parts = webmanifest__shortcut__url | split: '//' %}
+    {% if webmanifest__shortcut__url__parts.size == 1 %}
+      {% if webmanifest__icon__filter == 'relative_url' %}
+        {% capture webmanifest__shortcut__url %}{{ webmanifest__shortcut__url | relative_url }}{% endcapture %}
+      {% elsif webmanifest__icon__filter == 'absolute_url' %}
+        {% capture webmanifest__shortcut__url %}{{ webmanifest__shortcut__url | absolute_url }}{% endcapture %}
+      {% endif %}
+    {% endif %}
+    {% assign webmanifest__shortcut__url__parts = nil %}
+
+    {% capture webmanifest__shortcut__url %}"url":"{{ webmanifest__shortcut__url }}"{% endcapture %}
+    {% assign webmanifest__shortcut__data = webmanifest__shortcut__data | append: webmanifest__shortcut__url %}
+    {% assign webmanifest__shortcut__url = nil %}
+
+
+    {% assign webmanifest__shortcut__short_name = webmanifest__shortcut.short_name | default: nil %}
+    {% if webmanifest__shortcut__short_name %}
+      {% capture webmanifest__shortcut__short_name %}"short_name":"{{ webmanifest__shortcut__short_name }}"{% endcapture %}
+      {% assign webmanifest__shortcut__data = webmanifest__shortcut__data | append: webmanifest__shortcut__short_name %}
+      {% assign webmanifest__shortcut__short_name = nil %}
+    {% endif %}
+
+    {% assign webmanifest__shortcut__description = webmanifest__shortcut.description | default: nil %}
+    {% if webmanifest__shortcut__description %}
+      {% capture webmanifest__shortcut__description %}"description":"{{ webmanifest__shortcut__description }}"{% endcapture %}
+      {% assign webmanifest__shortcut__data = webmanifest__shortcut__data | append: webmanifest__shortcut__description %}
+      {% assign webmanifest__shortcut__description = nil %}
+    {% endif %}
+
+
+    {% comment %}
+      Mark_Start: webmanifest__shortcut__icons
+      See: webmanifest__icons
+    {% endcomment %}
+    {% assign webmanifest__shortcut__icons = webmanifest__shortcut.icons | default: nil %}
+    {% if webmanifest__shortcut__icons %}
+      {% assign webmanifest__shortcut__icons__list = '' | split: '' %}
+      {% assign webmanifest__shortcut__icons__filter = webmanifest__shortcut__icons.filter | default: nil %}
+      {% unless webmanifest__shortcut__icons__filter or webmanifest__shortcut__icons__filter == false %}
+        {% assign webmanifest__shortcut__icons__filter = webmanifest__shortcuts__icons__filter %}
+      {% endunless %}
+
+      {% for webmanifest__shortcut__icon in webmanifest__shortcut__icons %}
+        {% assign webmanifest__shortcut__icon__data = '' | split: '' %}
+
+
+        {% assign webmanifest__shortcut__icon__src = webmanifest__shortcut__icon.src | default: nil %}
+        {% unless webmanifest__shortcut__icon__src %}
+          {% continue %}
+        {% endunless %}
+
+        {% assign webmanifest__shortcut__icon__filter = webmanifest__shortcut__icon.filter | default: nil %}
+        {% unless webmanifest__shortcut__icon__filter or webmanifest__shortcut__icon__filter == false %}
+          {% assign webmanifest__shortcut__icon__filter = webmanifest__shortcut__icons__filter %}
+        {% endunless %}
+
+        {% assign webmanifest__shortcut__icon__src__parts = webmanifest__shortcut__icon__src | split: '//' %}
+        {% if webmanifest__shortcut__icon__src__parts.size == 1 %}
+          {% if webmanifest__shortcut__icon__filter == 'relative_url' %}
+            {% capture webmanifest__shortcut__icon__src %}{{ webmanifest__shortcut__icon__src | relative_url }}{% endcapture %}
+          {% elsif webmanifest__shortcut__icon__filter == 'absolute_url' %}
+            {% capture webmanifest__shortcut__icon__src %}{{ webmanifest__shortcut__icon__src | absolute_url }}{% endcapture %}
+          {% endif %}
+        {% endif %}
+        {% assign webmanifest__shortcut__icon__src__parts = nil %}
+        {% assign webmanifest__shortcut__icon__filter = nil %}
+
+        {% capture webmanifest__shortcut__icon__src %}"src":"{{ webmanifest__shortcut__icon__src }}"{% endcapture %}
+        {% assign webmanifest__shortcut__icon__data = webmanifest__shortcut__icon__data | append: webmanifest__shortcut__icon__src %}
+        {% assign webmanifest__shortcut__icon__src = nil %}
+
+
+        {% assign webmanifest__shortcut__icon__type = webmanifest__shortcut__icon.type | default: nil %}
+        {% if webmanifest__shortcut__icon__type %}
+          {% if webmanifest__shortcut__icon__type[0] %}
+            {% capture webmanifest__shortcut__icon__type %}"type":"image/{{ webmanifest__shortcut__icon__type | join: ' ' }}"{% endcapture %}
+          {% else %}
+            {% capture webmanifest__shortcut__icon__type %}"type":"image/{{ webmanifest__shortcut__icon__type }}"{% endcapture %}
+          {% endif %}
+          {% assign webmanifest__shortcut__icon__data = webmanifest__shortcut__icon__data | append: webmanifest__shortcut__icon__type %}
+        {% endif %}
+        {% assign webmanifest__shortcut__icon__type = nil %}
+
+        {% assign webmanifest__shortcut__icon__sizes = webmanifest__shortcut__icon.sizes | default: nil %}
+        {% if webmanifest__shortcut__icon__sizes %}
+          {% if webmanifest__shortcut__icon__sizes[0] %}
+            {% capture webmanifest__shortcut__icon__sizes %}"sizes":"{{ webmanifest__shortcut__icon__sizes | join: ' ' }}"{% endcapture %}
+          {% else %}
+            {% capture webmanifest__shortcut__icon__sizes %}"sizes":"{{ webmanifest__shortcut__icon__sizes }}"{% endcapture %}
+          {% endif %}
+          {% assign webmanifest__shortcut__icon__data = webmanifest__shortcut__icon__data | append: webmanifest__shortcut__icon__sizes %}
+        {% endif %}
+        {% assign webmanifest__shortcut__icon__sizes = nil %}
+
+        {% assign webmanifest__shortcut__icon__purpose = webmanifest__shortcut__icon.purpose | default: nil %}
+        {% if webmanifest__shortcut__icon__purpose %}
+          {% if webmanifest__shortcut__icon__purpose[0] %}
+            {% capture webmanifest__shortcut__icon__purpose %}"purpose":"{{ webmanifest__shortcut__icon__purpose | join: ' ' }}"{% endcapture %}
+          {% else %}
+            {% capture webmanifest__shortcut__icon__purpose %}"purpose":"{{ webmanifest__shortcut__icon__purpose }}"{% endcapture %}
+          {% endif %}
+          {% assign webmanifest__shortcut__icon__data = webmanifest__shortcut__icon__data | append: webmanifest__shortcut__icon__purpose %}
+        {% endif %}
+        {% assign webmanifest__shortcut__icon__purpose = nil %}
+
+        {% if webmanifest__shortcut__icon__data.size > 0 %}
+          {% capture webmanifest__shortcut__icons__item %}{{
+            webmanifest__curly_brace__open
+          }}{{
+            webmanifest__shortcut__icon__data | join: ',' | strip | strip_newlines
+          }}{{
+            webmanifest__curly_brace__close
+          }}{% endcapture %}
+
+          {% assign webmanifest__shortcut__icons__list = webmanifest__shortcut__icons__list | append: webmanifest__shortcut__icons__item %}
+          {% assign webmanifest__shortcut__icons__item = nil %}
+        {% endif %}
+
+        {% assign webmanifest__shortcut__icon__data = nil %}
+      {% endfor %}
+
+      {% assign webmanifest__shortcut__icon__filter = nil %}
+      {% assign webmanifest__shortcut__icon__data = nil %}
+      {% assign webmanifest__shortcut__icons__item = nil %}
+    {% else %}
+      {% assign webmanifest__shortcut__icons__list = '' | split: '' %}
+
+      {% capture webmanifest__shortcut__icons__item %}{{
+        webmanifest__curly_brace__open
+      }}"src":"https://placekitten.com/48/48","sizes":"48x48"{{
+        webmanifest__curly_brace__close
+      }}{% endcapture %}
+
+      {% assign webmanifest__shortcut__icons__list = webmanifest__shortcut__icons__list | append: webmanifest__shortcut__icons__item %}
+      {% assign webmanifest__shortcut__icons__item = nil %}
+    {% endif %}
+
+    {% if webmanifest__shortcut__icons__list.size > 0 %}
+      {% capture webmanifest__shortcut__icons__data %}"icons":{{ webmanifest__shortcut__icons__list | jsonify }}{% endcapture %}
+      {% assign webmanifest__shortcut__data = webmanifest__shortcut__data | append: webmanifest__shortcut__icons %}
+      {% assign webmanifest__shortcut__icons__data = nil %}
+      {% assign webmanifest__shortcut__icons__list = nil %}
+    {% endif %}
+
+
+    {% comment %}{% endcomment %}
+    {% if webmanifest__shortcut__data.size > 0 %}
+      {% capture webmanifest__shortcuts__item %}{{
+        webmanifest__curly_brace__open
+      }}{{
+        webmanifest__shortcut__data | join: ',' | strip | strip_newlines
+      }}{{
+        webmanifest__curly_brace__close
+      }}{% endcapture %}
+
+      {% assign webmanifest__shortcuts__list = webmanifest__shortcuts__list | append: webmanifest__shortcuts__item %}
+      {% assign webmanifest__shortcuts__item = nil %}
+    {% endif %}
+
+    {% assign webmanifest__shortcut__filter = nil %}
+    {% assign webmanifest__shortcut__data = nil %}
+  {% endfor %}
+  {% assign webmanifest__shortcuts__filter = nil %}
+{% endif %}
+
+{% if webmanifest__shortcuts__list.size > 0 %}
+  {% capture webmanifest__shortcuts__data %}"shortcuts":{{ webmanifest__shortcuts__list | jsonify }}{% endcapture %}
+  {% assign webmanifest__data = webmanifest__data | append: webmanifest__shortcuts__data %}
+  {% assign webmanifest__shortcuts__data = nil %}
+  {% assign webmanifest__shortcuts__list = nil %}
+{% endif %}
+{% comment %}
+  Mark_End: webmanifest__shortcut__icons
+{% endcomment %}
+
+
+{% comment %}{% endcomment %}
+{% capture webmanifest__output %}{{
+  webmanifest__curly_brace__open
+}}{{
+  webmanifest__data | join: ',' | strip | strip_newlines
+}}{{
+  webmanifest__curly_brace__close
+}}{% endcapture %}
+
+{% assign webmanifest__data = nil %}
+{% endcapture %}{{ webmanifest__output }}{% assign webmanifest__output = nil %}{% assign workspace__webmanifest = nil %}
